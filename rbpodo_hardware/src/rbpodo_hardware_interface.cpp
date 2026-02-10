@@ -116,6 +116,8 @@ std::vector<hardware_interface::StateInterface> RBPodoHardwareInterface::export_
     state_interfaces.emplace_back(hardware_interface::StateInterface(
         info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_position_states_[i]));
     state_interfaces.emplace_back(hardware_interface::StateInterface(
+        info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocity_states_[i]));
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
         info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_effort_states_[i]));
   }
 
@@ -246,6 +248,7 @@ hardware_interface::CallbackReturn RBPodoHardwareInterface::on_activate(const rc
   // command and state should be equal when starting
   for (uint i = 0; i < kNumberOfJoints; i++) {
     hw_position_commands_[i] = hw_position_states_[i];
+    hw_velocity_commands_[i] = 0.0;
     hw_effort_commands_[i] = 0;
   }
 
@@ -265,6 +268,9 @@ hardware_interface::return_type RBPodoHardwareInterface::read(const rclcpp::Time
   auto data = robot_->read_once();
   for (size_t i = 0; i < kNumberOfJoints; i++) {
     hw_position_states_[i] = data.sdata.jnt_ref[i] * DEG2RAD;
+  }
+  for (size_t i = 0; i < kNumberOfJoints; i++) {
+    hw_velocity_states_[i] = 0.0;
   }
   for (size_t i = 0; i < kNumberOfJoints; i++) {
     hw_effort_states_[i] = data.sdata.jnt_cur[i] * torque_constants_[i];

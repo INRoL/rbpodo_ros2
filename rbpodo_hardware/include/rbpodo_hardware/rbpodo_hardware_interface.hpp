@@ -123,6 +123,7 @@ class RBPodoHardwareInterface : public hardware_interface::SystemInterface {
 
   // states
   std::array<double, kNumberOfJoints> hw_position_states_;
+  std::array<double, kNumberOfJoints> hw_velocity_states_;
   std::array<double, kNumberOfJoints> hw_effort_states_;
 
   // ROS Node
